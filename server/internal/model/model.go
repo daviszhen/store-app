@@ -3,13 +3,14 @@ package model
 import "time"
 
 type Store struct {
-	ID        int       `json:"id" gorm:"primaryKey;autoIncrement"`
-	Name      string    `json:"name"`
-	Logo      string    `json:"logo"`
-	Theme     string    `json:"theme"`
-	Banner    string    `json:"banner"`
-	Notice    string    `json:"notice"`
-	CreatedAt time.Time `json:"created_at"`
+	ID           int       `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name         string    `json:"name"`
+	Logo         string    `json:"logo"`
+	Theme        string    `json:"theme"`
+	Banner       string    `json:"banner"`
+	Notice       string    `json:"notice"`
+	BusinessType string    `json:"business_type"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 type Category struct {

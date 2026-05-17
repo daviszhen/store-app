@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { CartProvider, useCart } from './context/CartContext';
+import { api } from './api/client';
+import type { Store } from './types';
 import Home from './pages/Home';
 import Category from './pages/Category';
 import ProductPage from './pages/Product';
@@ -11,6 +14,11 @@ function NavBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === '/';
+  const [storeName, setStoreName] = useState('商店');
+
+  useEffect(() => {
+    api.getStore().then((s) => setStoreName(s.name)).catch(() => {});
+  }, []);
 
   return (
     <nav className="navbar">
@@ -18,7 +26,7 @@ function NavBar() {
         {!isHome && (
           <button className="nav-back" onClick={() => navigate(-1)}>←</button>
         )}
-        <Link to="/" className="nav-title">瑞信商店</Link>
+        <Link to="/" className="nav-title">{storeName}</Link>
       </div>
       <Link to="/cart" className="nav-cart">
         🛒 {count > 0 && <span className="badge">{count}</span>}

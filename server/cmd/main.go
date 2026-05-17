@@ -13,6 +13,7 @@ func main() {
 	cfg := config.Load()
 
 	database.Init(cfg)
+	database.Seed(cfg.BusinessType)
 
 	r := gin.Default()
 

@@ -1,12 +1,14 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import type { Store, Category, Product } from '../types';
+import type { Store, Category, Product, CartItem } from '../types';
 import { api } from '../api/client';
+import { useCart } from '../context/CartContext';
 
 export default function Home() {
   const [store, setStore] = useState<Store | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const { items: cart, addItem, updateQuantity, removeItem } = useCart();
   const [activeCat, setActiveCat] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -16,6 +18,34 @@ export default function Home() {
     api.getCategories().then(setCategories);
     api.getProducts().then(setProducts);
   }, []);
+
+  const cartMap = useMemo(() => {
+    const map: Record<number, CartItem> = {};
+    cart.forEach((item) => { map[item.product_id] = item; });
+    return map;
+  }, [cart]);
+
+  const handleAdd = useCallback((e: React.MouseEvent, productId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(productId, 1);
+  }, [addItem]);
+
+  const handleIncrease = useCallback((e: React.MouseEvent, cartItemId: number, qty: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    updateQuantity(cartItemId, qty + 1);
+  }, [updateQuantity]);
+
+  const handleDecrease = useCallback((e: React.MouseEvent, cartItemId: number, qty: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (qty <= 1) {
+      removeItem(cartItemId);
+    } else {
+      updateQuantity(cartItemId, qty - 1);
+    }
+  }, [removeItem, updateQuantity]);
 
   const scrollToCategory = (catId: number) => {
     setActiveCat(catId);
@@ -78,15 +108,38 @@ export default function Home() {
             >
               <div className="cat-section-title">{cat.icon} {cat.name}</div>
               <div className="product-grid">
-                {cat.items.map((p) => (
-                  <Link key={p.id} to={`/product/${p.id}`} className="product-card">
-                    <div className="product-image">📦</div>
-                    <div className="product-info">
-                      <div className="product-name">{p.name}</div>
-                      <div className="product-price">¥{p.price}</div>
+                {cat.items.map((p) => {
+                  const ci = cartMap[p.id];
+                  return (
+                    <div key={p.id} className="product-card">
+                      <Link to={`/product/${p.id}`} className="product-card-link">
+                        <div className="product-image">📦</div>
+                        <div className="product-info">
+                          <div className="product-name">{p.name}</div>
+                          <div className="product-price">¥{p.price}</div>
+                        </div>
+                      </Link>
+                      {ci ? (
+                        <div className="cart-controls" onClick={(e) => e.preventDefault()}>
+                          <button
+                            className="qty-btn"
+                            onClick={(e) => handleDecrease(e, ci.id, ci.quantity)}
+                          >−</button>
+                          <span className="qty-num">{ci.quantity}</span>
+                          <button
+                            className="qty-btn"
+                            onClick={(e) => handleIncrease(e, ci.id, ci.quantity)}
+                          >＋</button>
+                        </div>
+                      ) : (
+                        <button
+                          className="add-cart-single"
+                          onClick={(e) => handleAdd(e, p.id)}
+                        >＋</button>
+                      )}
                     </div>
-                  </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}

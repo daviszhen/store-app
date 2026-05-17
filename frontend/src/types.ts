@@ -5,6 +5,7 @@ export interface Store {
   theme: string;
   banner: string;
   notice: string;
+  business_type: string;
 }
 
 export interface Category {

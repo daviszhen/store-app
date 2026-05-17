@@ -3,22 +3,24 @@ package config
 import "os"
 
 type Config struct {
-	DBHost     string
-	DBPort     string
-	DBUser     string
-	DBPassword string
-	DBName     string
-	ServerPort string
+	DBHost       string
+	DBPort       string
+	DBUser       string
+	DBPassword   string
+	DBName       string
+	ServerPort   string
+	BusinessType string
 }
 
 func Load() *Config {
 	return &Config{
-		DBHost:     getEnv("DB_HOST", "127.0.0.1"),
-		DBPort:     getEnv("DB_PORT", "6001"),
-		DBUser:     getEnv("DB_USER", "root"),
-		DBPassword: getEnv("DB_PASSWORD", "111"),
-		DBName:     getEnv("DB_NAME", "store_app"),
-		ServerPort: getEnv("SERVER_PORT", "8080"),
+		DBHost:       getEnv("DB_HOST", "127.0.0.1"),
+		DBPort:       getEnv("DB_PORT", "6001"),
+		DBUser:       getEnv("DB_USER", "root"),
+		DBPassword:   getEnv("DB_PASSWORD", "111"),
+		DBName:       getEnv("DB_NAME", "store_app"),
+		ServerPort:   getEnv("SERVER_PORT", "8080"),
+		BusinessType: getEnv("BUSINESS_TYPE", "grocery"),
 	}
 }
 
